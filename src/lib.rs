@@ -58,7 +58,6 @@ pub trait PackageManager: Send + Sync {
     /// the file when running `darling require-all`
     ///
     /// # Returns
-    /// The names of all explicitly installed packages as a `Vec<String>`, or an error if there was a system error
-    /// retrieving them.
-    fn get_all_explicit(&self, context: &Context) -> anyhow::Result<Vec<String>>;
+    /// The name and version of each installed package. as a `Vec<(name: String, version: String)>`.
+    fn get_all_explicit(&self, context: &Context) -> anyhow::Result<Vec<(String, String)>>;
 }
