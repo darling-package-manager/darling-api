@@ -35,13 +35,8 @@ pub trait PackageManager: Send + Sync {
     /// - `version` - The version of the package to install. If `None`, the latest version should be installed.
     ///
     /// # Returns
-    /// The version of the package installed, if none was specified in the input. Otherwise, `None`, or an
-    /// error if the package could not be installed.
-    fn install(
-        &self,
-        context: &Context,
-        package: &InstallationEntry,
-    ) -> anyhow::Result<Option<String>>;
+    /// An error if the package could not be installed.
+    fn install(&self, context: &Context, package: &InstallationEntry) -> anyhow::Result<()>;
 
     /// Uninstalls a package from the system. This does ***not*** affect the cache file, it simply removes the package
     /// from the system itself, and `darling-core` will handle removing the package from the cache file.
