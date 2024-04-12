@@ -1,5 +1,8 @@
+/// Data about an (un)installation command. This contains the name of the package to install, as well as
+/// a map of properties specified on the command line.
 #[derive(Clone)]
 pub struct InstallationEntry {
+    /// The name of the package. This is a unique identifier, not a human readable string.
     pub name: String,
 
     /// Additional properties specified on the command line. These are arbitrary String-String mappings passed as long arguments
@@ -8,11 +11,16 @@ pub struct InstallationEntry {
     pub properties: std::collections::HashMap<String, String>,
 }
 
+/// Global immutable data about the current darling session. This is currently almost entirely unused, but various
+/// configurations in the future are going to go here.
 pub struct Context {
+    /// The configuration cative when running darling.
     pub config: DarlingConfig,
 }
 
+/// The user-defined configuration options.
 pub struct DarlingConfig {
+    /// The location of the darling source on the users machine; `~/.local/share/darling/source` by default.
     pub source_location: String,
 }
 
@@ -24,7 +32,20 @@ impl std::default::Default for DarlingConfig {
     }
 }
 
+/// A package manager which gets a darling implementation. This provides the core functionality on how to install,
+/// uninstall, and list packages through darling. Most of these methods when implemented commonly use
+/// `std::process::Command` to install things through shell commands. In the rare case that a Rust API is available
+/// and advantageous for a particular package manager, that of course could be used as well.
 pub trait PackageManager: Send + Sync {
+    /// Returns the name of this package manager. This is a unique all-lowercase identifier that should not conflict
+    /// with any others. It's common to make this the name of the crate, without the `darling-` prefix. For example,
+    /// this could return `"example".to_owned()`, and the crate would be called `darling-example`.
+    ///
+    /// **TODO:** This may change into returning a `&'static str`. This might be easier to handle on the receiving end
+    /// (such as not having to borrow a value that's already borrowed, and we can convert it to owned when necessary),
+    /// but more importantly, it'd help reinforce that this should be an unchanging constant compile-time known value.
+    /// I set this as an owned `String` because they're just generally easier to work with and is the common convention
+    /// for method returns, but if there aren't any bad ramifications then this option should be considered.
     fn name(&self) -> String;
 
     /// Installs a package with the given version. If no version is supplied, this should install the latest version.
